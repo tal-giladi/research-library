@@ -1,0 +1,47 @@
+# Where `py lib.py discover` looks for new candidates.
+#
+# One record per topic. Only `topic` is required:
+#   topic         the tag applied to everything this source produces
+#   categories    arXiv categories to scan (cs.AI, cs.CL, cs.CR, cs.SE, ...)
+#   match         keywords; an item is kept if any one appears in its title or
+#                 abstract, case-insensitively. Omit `match` to take the whole
+#                 category, which only `max_per_run` then holds back.
+#   feeds         RSS or Atom URLs, filtered by the same `match` terms
+#   arxiv         a raw arXiv API query - see the warning at the bottom
+#   max_per_run   cap per topic per run (default 10)
+#
+# Discovery pulls each category ONCE per run (the newest `--scan` papers,
+# default 300) and does the keyword filtering locally, so adding a topic that
+# reuses a category you already scan costs nothing extra.
+#
+# Because the scan is a fixed window of recent submissions, a busy category
+# like cs.AI only reaches back a day or two at 300. Run discover most days, or
+# pass a bigger --scan after a gap. Try one before committing it:
+#   py lib.py discover --topic <name> --dry-run
+
+- topic: agent-memory
+  categories: [cs.AI, cs.CL]
+  match: ["agent memory", "context window", "long-term memory", "retrieval augmented", "memory management"]
+  max_per_run: 6
+
+- topic: agent-harness
+  categories: [cs.AI, cs.SE]
+  match: ["llm agent", "agentic", "tool use", "tool calling", "multi-agent", "agent framework"]
+  max_per_run: 6
+
+- topic: llm-security
+  categories: [cs.CR, cs.AI]
+  match: ["prompt injection", "jailbreak", "llm security", "adversarial prompt", "model extraction"]
+  max_per_run: 6
+
+# Feeds work the same way; `match` filters them too. Add whatever you read.
+- topic: engineering-blogs
+  feeds:
+    - https://simonwillison.net/atom/everything/
+  match: ["agent", "llm", "context window", "prompt"]
+  max_per_run: 5
+
+# A raw API query is still supported as an escape hatch:
+#   arxiv: cat:cs.AI
+# but keep it simple. arXiv's API answers 429 to anything containing AND or a
+# quoted phrase, which is exactly why the categories/match split above exists.

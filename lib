@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# Same wrapper for Git Bash / WSL.
+exec py "$(dirname "$0")/lib.py" "$@"

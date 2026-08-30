@@ -1,0 +1,6 @@
+# lib.py always writes LF. Without this, git would check the files back out as
+# CRLF on Windows and the next `build` would rewrite every one of them, turning
+# a no-op build into a repo-wide diff.
+* text=auto eol=lf
+*.png binary
+*.pdf binary

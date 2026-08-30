@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.lib/
+
+# The viewer is generated on every build and would otherwise rewrite a large
+# file into git history each time. Delete this line if you want it committed
+# (e.g. to serve it from GitHub Pages) - nothing else depends on the choice.
+library.html
