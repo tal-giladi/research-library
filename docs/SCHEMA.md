@@ -64,6 +64,11 @@ markers because they are rewritten whole. The one exception is ticking an
 `INBOX.md` checkbox, which is input: `py lib.py sync` reads those ticks, writes
 `status: read` into the real files, and regenerates the inbox without them.
 
+That tick has to happen in an editor. GitHub renders task lists inside repo
+files with `disabled` on the input and only makes them clickable in issues, PRs
+and comments, so the checkboxes on github.com and on the Pages site look right
+but do nothing.
+
 ## Digest structure
 
 `/digest` writes these sections, in this order, inside the digest markers:

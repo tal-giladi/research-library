@@ -47,7 +47,7 @@ Four layers, in the order you will actually reach for them:
 | Layer | Good for | Cost |
 |---|---|---|
 | the docsify site (`py lib.py serve`) | reading digests properly, full-text search, sidebar nav — same setup as the course repos | `index.html` + generated `_sidebar.md`, needs HTTP |
-| `INBOX.md`, `indexes/`, `topics/` | reading on GitHub itself, no clone needed; ticking things read | committed markdown |
+| `INBOX.md`, `indexes/`, `topics/` | reading on GitHub itself, no clone needed | committed markdown |
 | `library.html` (`py lib.py view`) | faceted filter by status and topic, TL;DR cards, works offline with no server | generated, gitignored |
 | `rg "term" library/` | finding an exact phrase across every digest and note | free |
 
@@ -75,9 +75,14 @@ sectioned per year, and a topic gets its own page once it reaches five papers
 plus `archived` and `dropped`. Change it three ways, whichever is nearest:
 
 1. `py lib.py read <slug>` / `rate <slug> 4` / `status <slug> reading`
-2. Tick the checkbox in `INBOX.md` (works in the GitHub web UI, so it works on
-   your phone), then `py lib.py sync`
+2. Tick the checkbox in `INBOX.md` **in your editor**, then `py lib.py sync`
 3. Edit the file. It is just a file.
+
+Note that checkboxes are not clickable on github.com or on the Pages site:
+GitHub renders task lists in repo *files* with `disabled`, and only makes them
+interactive inside issues, PRs and comments. From a phone the options are to
+edit `INBOX.md` through GitHub's web editor and sync later, or just read there
+and mark things read next time you are at the machine.
 
 `git log --follow library/2026/<file>.md` is your reading history, for free.
 

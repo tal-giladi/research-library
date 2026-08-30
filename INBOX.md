@@ -1,6 +1,6 @@
 # Inbox
 
-4 unread. Tick a box and run `py lib.py sync` to mark it read; ticking works in the GitHub web UI too.
+4 unread. Tick a box in your editor and run `py lib.py sync`. GitHub renders these checkboxes disabled in a repo file, so they are only clickable locally.
 
 - [ ] [Just a rumour of a bug is enough to find a security exploit these days](library/2026/2026-08-30-just-a-rumour-of-a-bug-is-enough-to-find-a-security-exploit.md)  -  `engineering-blogs`  -  2026-08-28  -  [source](https://simonwillison.net/2026/Aug/28/just-a-rumour-of-a-bug/)  -  _no digest_
 - [ ] [Breaking Claude Code Opus 5 Auto Mode](library/2026/2026-08-30-breaking-claude-code-opus-5-auto-mode.md)  -  `engineering-blogs`  -  2026-08-27  -  [source](https://simonwillison.net/2026/Aug/27/breaking-claude-code-opus-5-auto-mode/)  -  _no digest_

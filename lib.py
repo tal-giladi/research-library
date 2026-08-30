@@ -880,8 +880,9 @@ def build_inbox(papers):
     unread = [p for p in papers if p.status in UNREAD]
     unread.sort(key=lambda p: (str(p.get("added", "")), str(p.get("published", ""))), reverse=True)
     lines = ["# Inbox", "",
-             "%d unread. Tick a box and run `py lib.py sync` to mark it read;"
-             " ticking works in the GitHub web UI too." % len(unread), ""]
+             "%d unread. Tick a box in your editor and run `py lib.py sync`."
+             " GitHub renders these checkboxes disabled in a repo file, so they"
+             " are only clickable locally." % len(unread), ""]
     if not unread:
         lines.append("_Nothing waiting. Run `py lib.py discover`._")
     for p in unread:
