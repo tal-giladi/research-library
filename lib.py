@@ -7,8 +7,9 @@ HTML viewer is a generated artifact derived from it.
 
   py lib.py add <url>          fetch metadata, create a library entry
   py lib.py discover           poll arxiv + feeds listed in sources.yml
-  py lib.py build              regenerate README / INBOX / indexes / viewer
-  py lib.py view               build, then open the viewer in a browser
+  py lib.py build              regenerate README / INBOX / indexes / sidebar / viewer
+  py lib.py serve              build, then serve the docsify site locally
+  py lib.py view               build, then open the offline library.html card view
   py lib.py sync               apply INBOX.md checkboxes back to frontmatter
   py lib.py read <slug>        mark read (also: status / rate / drop)
   py lib.py list               filter the library
@@ -967,7 +968,7 @@ _What this topic adds up to. Yours to write - nothing below the line overwrites 
 
 
 def build_topic_pages(papers, counts):
-    changed = 0
+    changed, with_pages = 0, []
     for topic, n in sorted(counts.items()):
         path = os.path.join(TOPICS, topic + ".md")
         if n < TOPIC_PAGE_THRESHOLD and not os.path.exists(path):
@@ -978,7 +979,35 @@ def build_topic_pages(papers, counts):
             lines.append(row_line(TOPICS, p))
         changed += bool(replace_generated(path, "\n".join(lines),
                                           TOPIC_HEADER.format(topic=topic)))
-    return changed
+        with_pages.append(topic)
+    return changed, with_pages
+
+
+def build_sidebar(papers, counts, topic_pages):
+    """docsify navigation. Paths are root-relative because index.html aliases
+    every /*/_sidebar.md back to this one file."""
+    unread = sum(1 for p in papers if p.status in UNREAD)
+    lines = ["- [Library](/)",
+             "- [Inbox (%d)](INBOX.md)" % unread,
+             "",
+             "- **Indexes**",
+             "  - [By date](indexes/by-date.md)",
+             "  - [By topic](indexes/by-topic.md)",
+             "  - [By author](indexes/by-author.md)",
+             "  - [By rating](indexes/by-rating.md)",
+             ""]
+    if topic_pages:
+        lines.append("- **Topics**")
+        for t in topic_pages:
+            lines.append("  - [%s (%d)](topics/%s.md)" % (t, counts.get(t, 0), t))
+        lines.append("")
+    recent = papers[:8]
+    if recent:
+        lines.append("- **Recently added**")
+        for p in recent:
+            lines.append("  - [%s](%s)" % (md_escape(p.title), p.relpath))
+        lines.append("")
+    return write_if_changed(os.path.join(ROOT, "_sidebar.md"), "\n".join(lines))
 
 
 README_HEADER = """# Research library
@@ -1059,7 +1088,9 @@ def build(quiet=False):
     changed += build_by_topic(papers, counts)
     changed += build_by_author(papers)
     changed += build_by_rating(papers)
-    changed += build_topic_pages(papers, counts)
+    topic_changes, topic_pages = build_topic_pages(papers, counts)
+    changed += topic_changes
+    changed += build_sidebar(papers, counts, topic_pages)
     changed += build_readme(papers, counts)
     changed += build_viewer(papers)
     if not quiet:
@@ -1076,6 +1107,23 @@ def cmd_view(args):
     build(quiet=True)
     print("opening " + VIEWER)
     webbrowser.open("file:///" + VIEWER.replace("\\", "/"))
+
+
+def cmd_serve(args):
+    """docsify fetches the markdown over HTTP, so file:// will not do."""
+    import functools
+    import http.server
+    build(quiet=True)
+    handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=ROOT)
+    httpd = http.server.ThreadingHTTPServer(("127.0.0.1", args.port), handler)
+    url = "http://127.0.0.1:%d/" % args.port
+    print("serving %s at %s  (ctrl-c to stop)" % (ROOT, url))
+    if not args.no_open:
+        webbrowser.open(url)
+    try:
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        print("\nstopped")
 
 
 # ---------------------------------------------------------------------------
@@ -1469,7 +1517,13 @@ def main(argv=None):
     nb(d).set_defaults(func=cmd_discover)
 
     sub.add_parser("build", help="regenerate every derived file").set_defaults(func=cmd_build)
-    sub.add_parser("view", help="build, then open library.html").set_defaults(func=cmd_view)
+    sub.add_parser("view", help="build, then open the offline library.html card view"
+                   ).set_defaults(func=cmd_view)
+
+    sv = sub.add_parser("serve", help="build, then serve the docsify site locally")
+    sv.add_argument("--port", type=int, default=8899)
+    sv.add_argument("--no-open", action="store_true")
+    sv.set_defaults(func=cmd_serve)
     sub.add_parser("sync", help="apply INBOX.md checkboxes").set_defaults(func=cmd_sync)
 
     r = sub.add_parser("read", help="mark as read")

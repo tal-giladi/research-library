@@ -28,7 +28,7 @@ both just call `lib.py`.
 py lib.py discover              # poll sources.yml, write new stubs into the inbox
 py lib.py discover --dry-run    # see what it would add first
 py lib.py add <url>             # paste a link: fetches metadata, files it
-py lib.py view                  # build + open the searchable HTML viewer
+py lib.py serve                 # build + serve the docsify site at :8899
 py lib.py read <slug>           # mark read   (also: status / rate / drop)
 py lib.py sync                  # apply INBOX.md checkboxes back to frontmatter
 py lib.py list --undigested     # what still needs reading properly
@@ -42,13 +42,27 @@ no keys and no cost.
 
 ## Navigating
 
-Three layers, in the order you will actually reach for them:
+Four layers, in the order you will actually reach for them:
 
 | Layer | Good for | Cost |
 |---|---|---|
-| `library.html` (`py lib.py view`) | browsing, faceted filter by status and topic, fuzzy search over title/author/topic/TL;DR | generated, offline, no server |
-| `INBOX.md`, `indexes/`, `topics/` | reading on GitHub or a phone, no clone needed; ticking things read | committed markdown |
+| the docsify site (`py lib.py serve`) | reading digests properly, full-text search, sidebar nav — same setup as the course repos | `index.html` + generated `_sidebar.md`, needs HTTP |
+| `INBOX.md`, `indexes/`, `topics/` | reading on GitHub itself, no clone needed; ticking things read | committed markdown |
+| `library.html` (`py lib.py view`) | faceted filter by status and topic, TL;DR cards, works offline with no server | generated, gitignored |
 | `rg "term" library/` | finding an exact phrase across every digest and note | free |
+
+The docsify layer is the same pattern as `ai-engineer-course`: `index.html` loading
+docsify from a CDN, `.nojekyll` so Pages does not hide `_sidebar.md`, and a
+`_sidebar.md` that `build` regenerates. It renders the markdown directly rather
+than duplicating it, strips the YAML frontmatter and puts status, rating, topics
+and source links back as a one-line header.
+
+**Publishing it.** If the repo is public, turn on Pages (Settings → Pages →
+branch `main`, folder `/`) and it serves at
+`https://tal-giladi.github.io/research-library/`. GitHub Pages will not serve a
+private repo on a free plan, so a private library stays on `serve` locally plus
+GitHub's own markdown rendering — which is enough for everything except reading
+on your phone.
 
 Nothing is ever one giant list: the inbox holds unread only, `by-date` is
 sectioned per year, and a topic gets its own page once it reaches five papers
@@ -87,7 +101,9 @@ library/<year>/<added>-<slug>.md   the corpus - the only thing that matters
 sources.yml                        what discover polls
 lib.py                             the whole tool, stdlib only
 INBOX.md  indexes/  topics/        generated markdown (committed)
-library.html                       generated viewer (gitignored by default)
+_sidebar.md                        generated docsify nav (committed)
+index.html  .nojekyll              the docsify site
+library.html                       generated offline viewer (gitignored)
 docs/SCHEMA.md                     the frontmatter contract
 .claude/skills/digest/             the /digest skill
 ```
