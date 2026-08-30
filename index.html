@@ -14,6 +14,13 @@
     /* Status words carry most of the signal in the generated lists. */
     .markdown-section li code { font-size: .82em; padding: 1px 5px; }
     .markdown-section input[type=checkbox] { margin-right: .4em; }
+    .file-warning { max-width: 620px; margin: 12vh auto; padding: 0 24px;
+      font: 15px/1.6 ui-sans-serif, -apple-system, "Segoe UI", Roboto, sans-serif;
+      color: #2c3e50; }
+    .file-warning h1 { font-size: 20px; margin: 0 0 12px; }
+    .file-warning code { background: #f3f1ee; border-radius: 4px; padding: 2px 6px; }
+    .file-warning pre { background: #f3f1ee; border-radius: 6px; padding: 12px 14px;
+      overflow-x: auto; }
   </style>
 </head>
 <body>
@@ -84,11 +91,46 @@
       ]
     }
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/docsify@4"></script>
-  <script src="https://cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/docsify-copy-code@2"></script>
-  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-python.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-yaml.min.js"></script>
+  <script>
+    // Opened by double-click, docsify cannot fetch the markdown (the browser
+    // blocks file:// XHR) and renders a bare "404", which looks like the site
+    // is broken rather than like the wrong way to open it. Say so instead, and
+    // do not load docsify at all.
+    if (location.protocol === 'file:') {
+      // Drop docsify's theme too: it lays out around a .sidebar/.content pair
+      // that never gets created here, which pushes the message off-centre.
+      var theme = document.querySelector('link[href*="docsify"]');
+      if (theme) { theme.parentNode.removeChild(theme); }
+      document.body.innerHTML =
+        '<div class="file-warning">' +
+        '<h1>This page needs a web server</h1>' +
+        '<p>Docsify fetches the markdown files over HTTP, and browsers block ' +
+        'that for pages opened from disk. Opening <code>index.html</code> ' +
+        'directly will only ever show a 404.</p>' +
+        '<p>From the repo:</p>' +
+        '<pre>py lib.py serve</pre>' +
+        '<p>which builds, serves on <code>http://127.0.0.1:8899/</code> and ' +
+        'opens it. For a viewer that <em>does</em> work offline from disk, use ' +
+        '<code>py lib.py view</code> - that one is self-contained on purpose.</p>' +
+        '<p>The published copy is at <a href="https://tal-giladi.github.io/research-library/">' +
+        'tal-giladi.github.io/research-library</a>.</p>' +
+        '</div>';
+    } else {
+      // async=false keeps the load order, which docsify's plugins depend on.
+      [
+        'https://cdn.jsdelivr.net/npm/docsify@4',
+        'https://cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js',
+        'https://cdn.jsdelivr.net/npm/docsify-copy-code@2',
+        'https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-python.min.js',
+        'https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js',
+        'https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-yaml.min.js'
+      ].forEach(function (src) {
+        var s = document.createElement('script');
+        s.src = src;
+        s.async = false;
+        document.head.appendChild(s);
+      });
+    }
+  </script>
 </body>
 </html>
