@@ -88,7 +88,7 @@ and mark things read next time you are at the machine.
 
 ## Adding a topic
 
-Add a record to [`sources.yml`](sources.yml) and run `discover`. Nothing else —
+Add a record to [`sources.yml`](sources.yml ':ignore') and run `discover`. Nothing else —
 no schema change, no migration. Existing papers can be back-tagged in one pass:
 
 ```bash
